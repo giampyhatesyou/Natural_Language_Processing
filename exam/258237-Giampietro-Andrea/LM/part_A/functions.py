@@ -1,47 +1,21 @@
-# Add the class of your model only
-# Here is where you define the architecture of your model using pytorch
+# Add the functions used to train and evaluate the models
+import math
+import random
+
+import matplotlib
+matplotlib.use("Agg")  # save the plots to file, no display needed
 import matplotlib.pyplot as plt
+import numpy as np
 import torch
 import torch.nn as nn
-from functools import partial
-from torch.utils.data import DataLoader
 from tqdm import tqdm
-import math
-import numpy as np
-# Device
-DEVICE = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-def collate_fn(data, pad_token):
-    def merge(sequences):
-        '''
-        merge from batch * sent_len to batch * max_len
-        '''
-        lengths = [len(seq) for seq in sequences]
-        max_len = 1 if max(lengths)==0 else max(lengths)
-        # Pad token is zero in our case
-        # So we create a matrix full of PAD_TOKEN (i.e. 0) with the shape
-        # batch_size X maximum length of a sequence
-        padded_seqs = torch.LongTensor(len(sequences),max_len).fill_(pad_token)
-        for i, seq in enumerate(sequences):
-            end = lengths[i]
-            padded_seqs[i, :end] = seq # We copy each sequence into the matrix
-        padded_seqs = padded_seqs.detach()  # We remove these tensors from the computational graph
-        return padded_seqs, lengths
 
-    # Sort data by seq lengths
-
-    data.sort(key=lambda x: len(x["source"]), reverse=True)
-    new_item = {}
-    for key in data[0].keys():
-        new_item[key] = [d[key] for d in data]
-
-    source, _ = merge(new_item["source"])
-    target, lengths = merge(new_item["target"])
-
-    new_item["source"] = source.to(DEVICE)
-    new_item["target"] = target.to(DEVICE)
-    new_item["number_tokens"] = sum(lengths)
-    return new_item
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
 
 
 def train_loop(data, optimizer, criterion, model, clip=5):
@@ -50,53 +24,114 @@ def train_loop(data, optimizer, criterion, model, clip=5):
     number_of_tokens = []
 
     for sample in data:
-        optimizer.zero_grad() # Zeroing the gradient
+        optimizer.zero_grad()  # Zeroing the gradient (not the weights!)
         output = model(sample['source'])
         loss = criterion(output, sample['target'])
         loss_array.append(loss.item() * sample["number_tokens"])
         number_of_tokens.append(sample["number_tokens"])
-        loss.backward() # Compute the gradient, deleting the computational graph
-        # clip the gradient to avoid explosioning gradients
+        loss.backward()  # Compute the gradient, deleting the computational graph
+        # clip the gradient to avoid exploding gradients
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
-        optimizer.step() # Update the weights
+        optimizer.step()  # Update the weights
 
-    return sum(loss_array)/sum(number_of_tokens)
+    return sum(loss_array) / sum(number_of_tokens)
 
 
 def eval_loop(data, eval_criterion, model):
     model.eval()
-    loss_to_return = []
     loss_array = []
     number_of_tokens = []
-    # softmax = nn.Softmax(dim=1) # Use Softmax if you need the actual probability
-    with torch.no_grad(): # It used to avoid the creation of computational graph
+    with torch.no_grad():  # It is used to avoid the creation of the computational graph
         for sample in data:
             output = model(sample['source'])
-            loss = eval_criterion(output, sample['target'])
+            loss = eval_criterion(output, sample['target'])  # reduction='sum' -> total loss of the batch
             loss_array.append(loss.item())
             number_of_tokens.append(sample["number_tokens"])
 
-    ppl = math.exp(sum(loss_array) / sum(number_of_tokens))
-    loss_to_return = sum(loss_array) / sum(number_of_tokens)
+    loss_to_return = sum(loss_array) / sum(number_of_tokens)  # average loss per token
+    ppl = math.exp(loss_to_return)
     return ppl, loss_to_return
 
 
 def init_weights(mat):
+    # It already iterates over all the sub-modules: call it once as init_weights(model)
     for m in mat.modules():
         if type(m) in [nn.GRU, nn.LSTM, nn.RNN]:
             for name, param in m.named_parameters():
                 if 'weight_ih' in name:
                     for idx in range(4):
-                        mul = param.shape[0]//4
-                        torch.nn.init.xavier_uniform_(param[idx*mul:(idx+1)*mul])
+                        mul = param.shape[0] // 4
+                        torch.nn.init.xavier_uniform_(param[idx * mul:(idx + 1) * mul])
                 elif 'weight_hh' in name:
                     for idx in range(4):
-                        mul = param.shape[0]//4
-                        torch.nn.init.orthogonal_(param[idx*mul:(idx+1)*mul])
+                        mul = param.shape[0] // 4
+                        torch.nn.init.orthogonal_(param[idx * mul:(idx + 1) * mul])
                 elif 'bias' in name:
                     param.data.fill_(0)
         else:
             if type(m) in [nn.Linear]:
                 torch.nn.init.uniform_(m.weight, -0.01, 0.01)
-                if m.bias != None:
+                if m.bias is not None:
                     m.bias.data.fill_(0.01)
+
+
+def train_model(model, optimizer, train_loader, dev_loader, criterion_train, criterion_eval,
+                n_epochs, patience, clip):
+    """Train with early stopping on the dev perplexity.
+
+    The model is initialised ONCE by the caller: inside the epoch loop we only zero the gradients.
+    At the end the weights of the best epoch (lowest dev PPL) are loaded back into the model.
+    """
+    history = {"epoch": [], "train_loss": [], "dev_loss": [], "dev_ppl": []}
+    best_ppl = math.inf
+    best_state = None
+    patience_left = patience
+
+    pbar = tqdm(range(1, n_epochs + 1))
+    for epoch in pbar:
+        loss = train_loop(train_loader, optimizer, criterion_train, model, clip)
+        ppl_dev, loss_dev = eval_loop(dev_loader, criterion_eval, model)
+
+        history["epoch"].append(epoch)
+        history["train_loss"].append(loss)
+        history["dev_loss"].append(loss_dev)
+        history["dev_ppl"].append(ppl_dev)
+        pbar.set_description("Dev PPL: %f" % ppl_dev)
+
+        if ppl_dev < best_ppl:  # the lower, the better
+            best_ppl = ppl_dev
+            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
+            patience_left = patience
+        else:
+            patience_left -= 1
+            if patience_left <= 0:  # Early stopping with patience
+                break
+
+    model.load_state_dict(best_state)
+    return best_ppl, history
+
+
+def save_checkpoint(path, model, config, lang, results):
+    # Only plain python types + tensors: loadable with torch.load(weights_only=True)
+    torch.save({"model": model.state_dict(),
+                "config": config,
+                "word2id": lang.word2id,
+                "results": results}, path)
+
+
+def load_checkpoint(path, device):
+    return torch.load(path, map_location=device)
+
+
+def plot_history(history, title, path):
+    fig, ax = plt.subplots(figsize=(6, 4))
+    ax.plot(history["epoch"], history["train_loss"], label="train loss", marker="o", markersize=3)
+    ax.plot(history["epoch"], history["dev_loss"], label="dev loss", marker="x", markersize=3)
+    ax.set_xlabel("epoch")
+    ax.set_ylabel("cross-entropy per token")
+    ax.set_title(title)
+    ax.grid(True, alpha=0.3)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(path, dpi=120)
+    plt.close(fig)
