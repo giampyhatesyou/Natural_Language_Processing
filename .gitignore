@@ -1,7 +1,20 @@
-/.DS_Store
-/.conda
-/.ipynb_checkpoints
-/LICENSE
-/README.md
+# OS / editors
+.DS_Store
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.conda/
+
+# Model weights: too large for git, they are produced in each part's bin/ by `python main.py --train`
+# (publish them as a GitHub Release asset instead)
+exam/**/bin/*.pt
+
+# Course material that is not part of this project
 /labs
 /solutions
