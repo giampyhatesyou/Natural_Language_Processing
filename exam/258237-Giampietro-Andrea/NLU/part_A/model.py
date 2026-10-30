@@ -2,66 +2,51 @@ import torch
 import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
+# Part 2.A is incremental:
+#   1. baseline ModelIAS (LSTM encoder, one head for the slots and one for the intent)
+#   2. bidirectional LSTM                           -> bidirectional=True
+#   3. + dropout                                    -> dropout > 0
+
+
 class ModelIAS(nn.Module):
-    def __init__(self, hid_size, out_slot, out_int, emb_size, vocab_len, dropout, bidirectional, apply_dropout, n_layer=1, pad_index=0):        
+    def __init__(self, hid_size, out_slot, out_int, emb_size, vocab_len, n_layer=1, pad_index=0,
+                 bidirectional=False, dropout=0.0):
         super(ModelIAS, self).__init__()
-        
-        #Flags to control dropout and bidirectional
-        self.apply_dropout = apply_dropout
         self.bidirectional = bidirectional
-        
+
         self.embedding = nn.Embedding(vocab_len, emb_size, padding_idx=pad_index)
-        self.utt_encoder =  nn.LSTM(
-            input_size=emb_size,
-            hidden_size=hid_size,
-            num_layers=n_layer,
-            bidirectional=self.bidirectional,
-            batch_first=True
-        )
-        
-        if self.apply_dropout:
-            self.dropout = nn.Dropout(dropout)
-            
-        if bidirectional:
-            hid_size=hid_size*2
-        self.slot_out = nn.Linear(hid_size, out_slot)
-        self.intent_out = nn.Linear(hid_size, out_int)
-        
+        self.utt_encoder = nn.LSTM(input_size=emb_size, hidden_size=hid_size, num_layers=n_layer,
+                                   bidirectional=bidirectional, batch_first=True)
+        # With p = 0 dropout is the identity, so models 1 and 2 are not affected
+        self.dropout = nn.Dropout(dropout)
+
+        # The bidirectional encoder concatenates the forward and backward states
+        out_size = hid_size * 2 if bidirectional else hid_size
+        self.slot_out = nn.Linear(out_size, out_slot)
+        self.intent_out = nn.Linear(out_size, out_int)
+
     def forward(self, utterance, seq_lengths):
         # utterance.size() = batch_size X seq_len
-        utt_emb = self.embedding(utterance) # utt_emb.size() = batch_size X seq_len X emb_size
-        
-        # pack_padded_sequence avoid computation over pad tokens reducing the computational cost
-        
-        packed_input = pack_padded_sequence(utt_emb, seq_lengths.cpu().numpy(), batch_first=True)
-        # Process the batch
-        packed_output, (last_hidden, cell) = self.utt_encoder(packed_input) 
+        utt_emb = self.dropout(self.embedding(utterance))  # batch_size X seq_len X emb_size
 
-        # Unpack the sequence
+        # pack_padded_sequence avoids computation over pad tokens reducing the computational cost
+        packed_input = pack_padded_sequence(utt_emb, seq_lengths.cpu().numpy(), batch_first=True)
+        packed_output, (last_hidden, cell) = self.utt_encoder(packed_input)
         utt_encoded, input_sizes = pad_packed_sequence(packed_output, batch_first=True)
 
-        # Apply apply_dropout
-        if self.apply_dropout:
-            utt_encoded = self.dropout(utt_encoded)
-
-        # Get the last hidden state
+        # last_hidden: (n_layer * n_directions) X batch_size X hid_size, the last layer is at the end
         if self.bidirectional:
-            last_hidden = torch.cat((last_hidden[0], last_hidden[1]), dim=1)
+            # forward state at the last token + backward state at the first token
+            last_hidden = torch.cat((last_hidden[-2], last_hidden[-1]), dim=1)
         else:
-            last_hidden = last_hidden[-1,:,:]
-        
-        # Compute slot logits
-        slots = self.slot_out(utt_encoded)
-        # Compute intent logits
-        intent = self.intent_out(last_hidden)
-        
-        # Apply dropout if specified
-        if self.apply_dropout:
-            utt_encoded = self.dropout(utt_encoded)
-            last_hidden = self.dropout(last_hidden)
-        
-        # Slot size: batch_size, seq_len, classes 
-        slots = slots.permute(0,2,1) # We need this for computing the loss
-        # Slot size: batch_size, classes, seq_len
-        return slots, intent
+            last_hidden = last_hidden[-1]
 
+        # Dropout must be applied BEFORE the output layers, otherwise it has no effect on the logits
+        utt_encoded = self.dropout(utt_encoded)
+        last_hidden = self.dropout(last_hidden)
+
+        slots = self.slot_out(utt_encoded)       # batch_size X seq_len X classes
+        intent = self.intent_out(last_hidden)    # batch_size X classes
+
+        slots = slots.permute(0, 2, 1)  # batch_size X classes X seq_len, as the loss expects
+        return slots, intent
