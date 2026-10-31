@@ -2,9 +2,9 @@
 
 The first version of this project (exam submission, July/August 2025) had logic errors that changed the meaning
 of several experiments. This file lists each problem, what it broke, and how the current code fixes it.
-Paths refer to `exam/258237-Giampietro-Andrea/`.
+The folders `LM/` and `NLU/` of the submission are now `language_modeling/` and `intent_slot_filling/`.
 
-## LM, part A (`LM/part_A`)
+## LM, part A (`language_modeling/part_A`)
 
 | # | Problem in the original code | Effect | Fix |
 |---|---|---|---|
@@ -16,7 +16,7 @@ Paths refer to `exam/258237-Giampietro-Andrea/`.
 | 6 | Dataset paths relative to the working directory | The script only worked when launched from the repository root | paths relative to `__file__` |
 | 7 | Minor: `model.apply(init_weights)` (the function already loops over all modules, so every module was initialised several times), `range(1, n_epochs)` (99 epochs), unused duplicate `get_vocab`, OOV words silently truncating the sentence | — | `init_weights(model)` once, `n_epochs` epochs, OOV raises an error |
 
-## LM, part B (`LM/part_B`)
+## LM, part B (`language_modeling/part_B`)
 
 | # | Problem in the original code | Effect | Fix |
 |---|---|---|---|
@@ -27,7 +27,7 @@ Paths refer to `exam/258237-Giampietro-Andrea/`.
 | 5 | `LM_LSTM_nt_avsgd` identical to `LM_LSTM_variational_dropout`, `train_with_AvSGD` identical to `train_loop` | Duplicated code | one model `LM_LSTM_WT` (dropout 0 = plain weight tying) and NT-AvSGD as an optimizer wrapper |
 | 6 | The report mentions a projection layer for different embedding/hidden sizes | Not in the code | weight tying now explicitly requires `emb_size == hid_size` |
 
-## NLU, part A (`NLU/part_A`)
+## NLU, part A (`intent_slot_filling/part_A`)
 
 | # | Problem in the original code | Effect | Fix |
 |---|---|---|---|
@@ -39,7 +39,7 @@ Paths refer to `exam/258237-Giampietro-Andrea/`.
 | 6 | Label ids created by iterating a `set` of strings | String hashing is randomised per Python process, so the ids changed from one execution to the next | sorted label vocabularies |
 | 7 | No seeds; `CUDA_LAUNCH_BLOCKING=1` left on | Runs not reproducible; slower GPU training | seed = base seed + run index; debug flag removed |
 
-## NLU, part B (`NLU/part_B`)
+## NLU, part B (`intent_slot_filling/part_B`)
 
 | # | Problem | Effect | Fix |
 |---|---|---|---|

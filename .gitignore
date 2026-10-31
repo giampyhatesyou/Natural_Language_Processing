@@ -13,7 +13,7 @@ venv/
 
 # Model weights: too large for git, they are produced in each part's bin/ by `python main.py --train`
 # (publish them as a GitHub Release asset instead)
-exam/**/bin/*.pt
+**/bin/*.pt
 
 # Course material that is not part of this project
 /labs
