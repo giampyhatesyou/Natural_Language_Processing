@@ -12,9 +12,18 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from functions import *
-from model import *
-from utils import *
+from functions import (
+    eval_loop,
+    init_weights,
+    load_checkpoint,
+    plot_history,
+    sample_std,
+    save_checkpoint,
+    set_seed,
+    train_model,
+)
+from model import ModelIAS
+from utils import DEVICE, PAD_TOKEN, IntentsAndSlots, Lang, collate_fn, create_dev_set, load_data
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.path.join(DIR, "dataset")
@@ -37,7 +46,7 @@ CONFIG = {
     "seed": 42,
 }
 
-# Part 2.A is incremental: every experiment starts from the best model of the previous one
+# Part A is incremental: every experiment starts from the best model of the previous one
 EXPERIMENTS = {
     "lstm": {"bidirectional": False, "dropout": 0.0},
     "bilstm": {"bidirectional": True, "dropout": 0.0},
@@ -88,10 +97,10 @@ def train_experiment(name, config, lang, train_loader, dev_loader, test_loader):
 
     slot_f1s = np.asarray([r["slot_f1"] for r in runs])
     intent_acc = np.asarray([r["intent_acc"] for r in runs])
-    summary = {"slot_f1_mean": slot_f1s.mean(), "slot_f1_std": slot_f1s.std(),
-               "intent_acc_mean": intent_acc.mean(), "intent_acc_std": intent_acc.std(), "runs": runs}
-    print(f"'{name}' over {len(runs)} runs: slot F1 {slot_f1s.mean():.4f} +- {slot_f1s.std():.4f} | "
-          f"intent acc {intent_acc.mean():.4f} +- {intent_acc.std():.4f} "
+    summary = {"slot_f1_mean": slot_f1s.mean(), "slot_f1_std": sample_std(slot_f1s),
+               "intent_acc_mean": intent_acc.mean(), "intent_acc_std": sample_std(intent_acc), "runs": runs}
+    print(f"'{name}' over {len(runs)} runs: slot F1 {slot_f1s.mean():.4f} +- {sample_std(slot_f1s):.4f} | "
+          f"intent acc {intent_acc.mean():.4f} +- {sample_std(intent_acc):.4f} "
           f"(checkpoint saved: run {best_run['run']})")
     return summary
 

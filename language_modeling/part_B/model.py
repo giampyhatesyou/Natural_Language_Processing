@@ -1,9 +1,10 @@
 import torch.nn as nn
 
-# Part 1.B starts from the LSTM of part 1.A and adds, incrementally (Merity et al., 2018):
+# Part B starts from the LSTM of part A and adds, incrementally (Merity et al., 2018):
 #   1. weight tying                                  -> LM_LSTM_WT with emb_dropout = out_dropout = 0
 #   2. + variational dropout (no DropConnect)        -> LM_LSTM_WT with emb_dropout, out_dropout > 0
-#   3. + Non-monotonically Triggered AvSGD            -> same model as 2, the change is in the optimisation (functions.py)
+#   3. + Non-monotonically Triggered AvSGD            -> same model as 2, the change is in the optimisation
+#                                                        (NTAvSGD in functions.py)
 
 
 class VariationalDropout(nn.Module):

@@ -1,10 +1,10 @@
 import torch.nn as nn
 
-# Part 1.A is incremental:
+# Part A is incremental:
 #   1. replace the RNN cell of the baseline with an LSTM               -> LM_LSTM
 #   2. add a dropout layer after the embedding and one before the output -> LM_LSTM_dropout
 #   3. replace SGD with AdamW (same model as step 2, see main.py)
-# Weight tying is NOT used here: it belongs to part 1.B.
+# Weight tying is NOT used here: it belongs to part B.
 
 
 class LM_LSTM(nn.Module):

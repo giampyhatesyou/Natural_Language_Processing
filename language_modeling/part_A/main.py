@@ -12,9 +12,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from functions import *
-from model import *
-from utils import *
+from functions import eval_loop, init_weights, load_checkpoint, plot_history, save_checkpoint, set_seed, train_model
+from model import LM_LSTM, LM_LSTM_dropout
+from utils import DEVICE, Lang, PennTreeBank, collate_fn, read_file
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.path.join(DIR, "..", "dataset")
@@ -34,7 +34,7 @@ CONFIG = {
     "seed": 42,
 }
 
-# Part 1.A is incremental: every experiment starts from the best model of the previous one
+# Part A is incremental: every experiment starts from the best model of the previous one
 EXPERIMENTS = {
     # 1. the RNN cell of the baseline replaced by an LSTM (SGD)
     "lstm": {"model": "LM_LSTM", "optimizer": "sgd", "lr": 2.0},

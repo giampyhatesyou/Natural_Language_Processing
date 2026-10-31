@@ -4,6 +4,7 @@ import random
 from contextlib import contextmanager, nullcontext
 
 import matplotlib
+
 matplotlib.use("Agg")  # save the plots to file, no display needed
 import matplotlib.pyplot as plt
 import numpy as np
@@ -91,7 +92,7 @@ class NTAvSGD:
         if self.triggered:
             self.n_averaged += 1
             with torch.no_grad():
-                for avg, param in zip(self.avg_params, self.model.parameters()):
+                for avg, param in zip(self.avg_params, self.model.parameters(), strict=True):
                     avg.add_(param - avg, alpha=1.0 / self.n_averaged)  # avg_k = avg_k-1 + (w_k - avg_k-1) / k
 
     def check(self, ppl_dev, epoch):
@@ -113,13 +114,13 @@ class NTAvSGD:
             return
         backup = [param.detach().clone() for param in self.model.parameters()]
         with torch.no_grad():
-            for param, avg in zip(self.model.parameters(), self.avg_params):
+            for param, avg in zip(self.model.parameters(), self.avg_params, strict=True):
                 param.copy_(avg)
         try:
             yield
         finally:
             with torch.no_grad():
-                for param, saved in zip(self.model.parameters(), backup):
+                for param, saved in zip(self.model.parameters(), backup, strict=True):
                     param.copy_(saved)
 
 

@@ -12,9 +12,18 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer
 
-from functions import *
-from model import *
-from utils import *
+from functions import (
+    build_optimizer,
+    eval_loop,
+    linear_warmup_scheduler,
+    load_checkpoint,
+    sample_std,
+    save_checkpoint,
+    set_seed,
+    train_model,
+)
+from model import JointBERT
+from utils import DEVICE, IGNORE_INDEX, IntentsAndSlots, Lang, collate_fn, create_dev_set, load_data
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.path.join(DIR, "dataset")
@@ -81,8 +90,9 @@ def train(config, lang, tokenizer, train_loader, dev_loader, test_loader):
 
     slot_f1s = np.asarray([r["slot_f1"] for r in runs])
     intent_acc = np.asarray([r["intent_acc"] for r in runs])
-    print(f"\nBERT over {len(runs)} runs: slot F1 {slot_f1s.mean():.4f} +- {slot_f1s.std():.4f} | "
-          f"intent acc {intent_acc.mean():.4f} +- {intent_acc.std():.4f} (checkpoint saved: run {best_run['run']})")
+    print(f"\nBERT over {len(runs)} runs: slot F1 {slot_f1s.mean():.4f} +- {sample_std(slot_f1s):.4f} | "
+          f"intent acc {intent_acc.mean():.4f} +- {sample_std(intent_acc):.4f} "
+          f"(checkpoint saved: run {best_run['run']})")
 
 
 def evaluate_checkpoint(test_raw):

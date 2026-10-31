@@ -12,9 +12,18 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
-from functions import *
-from model import *
-from utils import *
+from functions import (
+    NTAvSGD,
+    eval_loop,
+    init_weights,
+    load_checkpoint,
+    plot_history,
+    save_checkpoint,
+    set_seed,
+    train_model,
+)
+from model import LM_LSTM_WT
+from utils import DEVICE, Lang, PennTreeBank, collate_fn, read_file
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DATASET_DIR = os.path.join(DIR, "..", "dataset")
@@ -35,7 +44,7 @@ CONFIG = {
     "seed": 42,
 }
 
-# Part 1.B is incremental: every experiment starts from the best model of the previous one
+# Part B is incremental: every experiment starts from the best model of the previous one
 EXPERIMENTS = {
     # 1. LSTM + weight tying
     "wt": {"emb_dropout": 0.0, "out_dropout": 0.0, "nt_avsgd": False},

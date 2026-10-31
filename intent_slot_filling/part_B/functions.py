@@ -18,6 +18,12 @@ def set_seed(seed):
     torch.cuda.manual_seed_all(seed)
 
 
+def sample_std(values):
+    # Sample standard deviation (n - 1 in the denominator): the right estimate for a handful of runs
+    values = np.asarray(values)
+    return float(values.std(ddof=1)) if len(values) > 1 else 0.0
+
+
 def build_optimizer(model, lr, weight_decay):
     # Standard BERT fine-tuning: AdamW, no weight decay on biases and LayerNorm weights (the 1-D tensors)
     decay = [p for p in model.parameters() if p.ndim >= 2]
@@ -76,10 +82,10 @@ def eval_loop(data, criterion_slots, criterion_intents, model, lang):
             # i.e. of the positions whose label is not IGNORE_INDEX
             output_slots = torch.argmax(slots, dim=1)  # batch_size X seq_len
             first_subtoken = sample['slot_labels'] != IGNORE_INDEX
-            for id_seq, (words, gt_slots) in enumerate(zip(sample['words'], sample['slots'])):
+            for id_seq, (words, gt_slots) in enumerate(zip(sample['words'], sample['slots'], strict=True)):
                 pred_ids = output_slots[id_seq][first_subtoken[id_seq]].tolist()
-                ref_slots.append(list(zip(words, gt_slots)))
-                hyp_slots.append([(word, lang.id2slot[pred]) for word, pred in zip(words, pred_ids)])
+                ref_slots.append(list(zip(words, gt_slots, strict=True)))
+                hyp_slots.append([(word, lang.id2slot[pred]) for word, pred in zip(words, pred_ids, strict=True)])
 
     results = evaluate(ref_slots, hyp_slots)
     report_intent = classification_report(ref_intents, hyp_intents, zero_division=0, output_dict=True)

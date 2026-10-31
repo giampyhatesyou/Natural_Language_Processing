@@ -3,6 +3,7 @@ import math
 import random
 
 import matplotlib
+
 matplotlib.use("Agg")  # save the plots to file, no display needed
 import matplotlib.pyplot as plt
 import numpy as np

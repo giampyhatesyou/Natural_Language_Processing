@@ -18,11 +18,11 @@ def read_file(path, eos_token="<eos>"):
 # This class computes and stores our vocab
 # Word to ids and ids to word
 class Lang():
-    def __init__(self, corpus, special_tokens=[]):
+    def __init__(self, corpus, special_tokens=()):
         self.word2id = self.get_vocab(corpus, special_tokens)
         self.id2word = {v: k for k, v in self.word2id.items()}
 
-    def get_vocab(self, corpus, special_tokens=[]):
+    def get_vocab(self, corpus, special_tokens=()):
         output = {}
         i = 0
         for st in special_tokens:

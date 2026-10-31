@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
-# Part 2.A is incremental:
+# Part A is incremental:
 #   1. baseline ModelIAS (LSTM encoder, one head for the slots and one for the intent)
 #   2. bidirectional LSTM                           -> bidirectional=True
 #   3. + dropout                                    -> dropout > 0

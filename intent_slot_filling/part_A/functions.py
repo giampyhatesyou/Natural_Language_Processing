@@ -2,6 +2,7 @@
 import random
 
 import matplotlib
+
 matplotlib.use("Agg")  # save the plots to file, no display needed
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,6 +19,12 @@ def set_seed(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
+
+
+def sample_std(values):
+    # Sample standard deviation (n - 1 in the denominator): the right estimate for a handful of runs
+    values = np.asarray(values)
+    return float(values.std(ddof=1)) if len(values) > 1 else 0.0
 
 
 def train_loop(data, optimizer, criterion_slots, criterion_intents, model, clip=5):

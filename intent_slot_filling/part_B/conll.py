@@ -1,5 +1,6 @@
 import re
 
+
 def stats():
     return {'cor': 0, 'hyp': 0, 'ref': 0}
 
