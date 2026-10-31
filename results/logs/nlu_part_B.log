@@ -1,0 +1,80 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+=== Fine-tuning bert-base-uncased: {'bert_model': 'bert-base-uncased', 'batch_size_train': 32, 'batch_size_dev': 64, 'batch_size_test': 64, 'lr': 5e-05, 'weight_decay': 0.01, 'warmup': 0.1, 'dropout': 0.1, 'clip': 1.0, 'n_epochs': 10, 'patience': 3, 'runs': 5, 'seed': 42}
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 15365.45it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:27<04:06, 27.35s/it] 20%|██        | 2/10 [00:55<03:42, 27.79s/it] 30%|███       | 3/10 [01:21<03:10, 27.21s/it] 40%|████      | 4/10 [01:48<02:41, 26.94s/it] 50%|█████     | 5/10 [02:15<02:14, 26.89s/it] 60%|██████    | 6/10 [02:42<01:47, 26.84s/it] 70%|███████   | 7/10 [03:08<01:20, 26.75s/it] 80%|████████  | 8/10 [03:35<00:53, 26.64s/it] 90%|█████████ | 9/10 [04:01<00:26, 26.55s/it]                                              run 0: epochs 10 | dev slot F1 0.9849 | test slot F1 0.9533 | test intent acc 0.9731
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 4966.01it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:26<03:58, 26.52s/it] 20%|██        | 2/10 [00:53<03:32, 26.61s/it] 30%|███       | 3/10 [01:19<03:05, 26.55s/it] 40%|████      | 4/10 [01:46<02:39, 26.55s/it] 50%|█████     | 5/10 [02:12<02:13, 26.63s/it] 60%|██████    | 6/10 [02:39<01:46, 26.65s/it] 70%|███████   | 7/10 [03:06<01:20, 26.69s/it] 80%|████████  | 8/10 [03:33<00:53, 26.71s/it] 90%|█████████ | 9/10 [03:59<00:26, 26.62s/it]                                              run 1: epochs 10 | dev slot F1 0.9832 | test slot F1 0.9546 | test intent acc 0.9731
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 9847.41it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:26<04:00, 26.72s/it] 20%|██        | 2/10 [00:53<03:34, 26.78s/it] 30%|███       | 3/10 [01:20<03:07, 26.74s/it] 40%|████      | 4/10 [01:46<02:40, 26.72s/it] 50%|█████     | 5/10 [02:13<02:13, 26.68s/it] 60%|██████    | 6/10 [02:40<01:46, 26.72s/it] 70%|███████   | 7/10 [03:07<01:20, 26.70s/it] 80%|████████  | 8/10 [03:33<00:53, 26.60s/it] 90%|█████████ | 9/10 [04:00<00:26, 26.66s/it]100%|██████████| 10/10 [04:26<00:00, 26.54s/it]                                               run 2: epochs 10 | dev slot F1 0.9829 | test slot F1 0.9562 | test intent acc 0.9765
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 4146.77it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:26<03:59, 26.60s/it] 20%|██        | 2/10 [00:53<03:33, 26.66s/it] 30%|███       | 3/10 [01:20<03:07, 26.84s/it] 40%|████      | 4/10 [01:47<02:40, 26.77s/it] 50%|█████     | 5/10 [02:13<02:13, 26.74s/it] 60%|██████    | 6/10 [02:40<01:46, 26.67s/it] 70%|███████   | 7/10 [03:06<01:19, 26.64s/it] 80%|████████  | 8/10 [03:33<00:53, 26.63s/it] 90%|█████████ | 9/10 [03:59<00:26, 26.50s/it]100%|██████████| 10/10 [04:26<00:00, 26.59s/it]                                               run 3: epochs 10 | dev slot F1 0.9835 | test slot F1 0.9555 | test intent acc 0.9787
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 4101.98it/s]
+[transformers] [1mBertModel LOAD REPORT[0m from: bert-base-uncased
+Key                                        | Status     |  | 
+-------------------------------------------+------------+--+-
+cls.predictions.transform.LayerNorm.weight | UNEXPECTED |  | 
+cls.predictions.bias                       | UNEXPECTED |  | 
+cls.seq_relationship.weight                | UNEXPECTED |  | 
+cls.seq_relationship.bias                  | UNEXPECTED |  | 
+cls.predictions.transform.LayerNorm.bias   | UNEXPECTED |  | 
+cls.predictions.transform.dense.bias       | UNEXPECTED |  | 
+cls.predictions.transform.dense.weight     | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+  0%|          | 0/10 [00:00<?, ?it/s] 10%|█         | 1/10 [00:26<03:59, 26.62s/it] 20%|██        | 2/10 [00:53<03:33, 26.72s/it] 30%|███       | 3/10 [01:20<03:07, 26.72s/it] 40%|████      | 4/10 [01:46<02:40, 26.67s/it] 50%|█████     | 5/10 [02:13<02:13, 26.66s/it] 60%|██████    | 6/10 [02:40<01:46, 26.67s/it] 70%|███████   | 7/10 [03:06<01:19, 26.55s/it] 80%|████████  | 8/10 [03:32<00:53, 26.55s/it]                                              run 4: epochs 9 | dev slot F1 0.9829 | test slot F1 0.9549 | test intent acc 0.9754
+
+BERT over 5 runs: slot F1 0.9549 +- 0.0010 | intent acc 0.9754 +- 0.0021 (checkpoint saved: run 0)
