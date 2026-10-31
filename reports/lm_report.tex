@@ -4,9 +4,8 @@
 \usepackage[T1]{fontenc}
 \usepackage{url}
 
-\title{Regularising an LSTM Language Model on the Penn Treebank\\[3pt]
-  \normalsize NLU course project -- language modelling (lab 4)}
-\name{Andrea Giampietro (258237)}
+\title{Regularising an LSTM Language Model on the Penn Treebank}
+\name{Andrea Giampietro}
 \address{University of Trento}
 \email{}
 
@@ -24,10 +23,9 @@ to 92.3.
 \section{Introduction}
 
 A language model estimates the probability of the next word given the previous ones, and its quality is measured
-by the perplexity (PPL), the exponential of the average per-token cross-entropy on held-out text. This report
-describes the language modelling project of the NLU course: a word-level LSTM \cite{hochreiter1997lstm} trained on
-the Penn Treebank (PTB) \cite{marcus1993ptb,mikolov2010rnnlm} and improved incrementally, each step starting from the
-best model of the previous one. Part~A adds dropout \cite{srivastava2014dropout} and replaces SGD with AdamW
+by the perplexity (PPL), the exponential of the average per-token cross-entropy on held-out text. We train a
+word-level LSTM \cite{hochreiter1997lstm} on the Penn Treebank (PTB) \cite{marcus1993ptb,mikolov2010rnnlm} and
+improve it incrementally, each step starting from the best model of the previous one. Part~A adds dropout \cite{srivastava2014dropout} and replaces SGD with AdamW
 \cite{loshchilov2019adamw}; part~B keeps SGD and adds the three techniques of AWD-LSTM \cite{merity2018awdlstm}:
 weight tying, variational dropout and NT-AvSGD. The code is available at
 \url{https://github.com/giampyhatesyou/Natural_Language_Processing}.
@@ -67,7 +65,8 @@ itself a plateau detector, and applied to $\bar w$ afterwards with a patience of
 \section{Results}
 
 Tables~\ref{tab:partA} and~\ref{tab:partB} report the dev and test PPL of one run per configuration (seed 42,
-trained on a T4 GPU), and Figure~\ref{fig:curves} the dev PPL after every epoch. In part~A, dropout lowers the test
+trained on a T4 GPU), and Figure~\ref{fig:curves} the dev PPL after every epoch. The variance across seeds is not
+estimated, so small differences should be read with caution. In part~A, dropout lowers the test
 PPL of the LSTM by 15.2 points and AdamW, on the same model, by a further 17.0, reaching 109.0. In part~B the tied
 LSTM reaches 116.9 with 45\% fewer parameters (the untied LSTM of part~A, trained with a larger batch and learning
 rate, reaches 141.3), and variational dropout gives the largest gain of the study ($-19.5$). NT-AvSGD lowers the
