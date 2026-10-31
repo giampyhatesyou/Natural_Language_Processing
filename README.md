@@ -18,23 +18,36 @@ It has two assignments, each split into two incremental parts:
 
 ## Results
 
-### Intent classification and slot filling, LSTM (ATIS test set, 5 runs, mean ± std)
+All the models were trained on a Colab T4 GPU with [`run_on_colab.ipynb`](run_on_colab.ipynb); every number
+below is reproduced by `python main.py`, which evaluates the checkpoints stored in `bin/`.
+
+### Language modelling (Penn Treebank, perplexity, lower is better)
+
+| Part | Model | Dev PPL | Test PPL |
+| - | - | - | - |
+| A | LSTM | 146.4 | 141.3 |
+| A | + dropout | 131.1 | 126.0 |
+| A | + AdamW | 121.2 | **109.0** |
+| B | LSTM + weight tying | 120.7 | 116.9 |
+| B | + variational dropout | 99.4 | 97.4 |
+| B | + NT-AvSGD | 94.9 | **92.3** |
+
+Every technique lowers the perplexity. Part B trains with plain SGD, as NT-AvSGD requires, and still ends well
+below the AdamW model of part A; the weight averaging of NT-AvSGD alone takes 5 points off the variational
+dropout model.
+
+### Intent classification and slot filling (ATIS test set)
 
 | Model | Slot F1 | Intent accuracy |
 | - | - | - |
-| LSTM | 0.921 ± 0.002 | 0.932 ± 0.007 |
-| BiLSTM | 0.940 ± 0.002 | 0.945 ± 0.002 |
-| BiLSTM + dropout | **0.947 ± 0.002** | **0.952 ± 0.004** |
+| LSTM | 0.929 | 0.940 |
+| BiLSTM | 0.946 | 0.944 |
+| BiLSTM + dropout | 0.949 | 0.950 |
+| BERT (`bert-base-uncased`) | **0.953** | **0.973** |
 
-Every step of the incremental protocol improves both metrics. In each run the test set is evaluated with the
-weights of the best dev epoch (early stopping on the dev slot F1). The training curves of the run kept in
-`bin/` are in [`intent_slot_filling/part_A/plots`](intent_slot_filling/part_A/plots).
-
-### Language modelling and BERT
-
-These experiments are being re-run on a GPU with the fixed code (`python main.py --train` in
-`language_modeling/part_A`, `language_modeling/part_B` and `intent_slot_filling/part_B`). The numbers of the
-first submission are not reported because they were produced by the code described in [CHANGES.md](CHANGES.md).
+Each model is trained 5 times with different seeds and the table reports the run with the best dev slot F1
+(the checkpoint in `bin/`); in every run the test set is evaluated with the weights of the best dev epoch.
+Every step of part A improves both metrics, and the fine-tuned BERT is the best model on both tasks.
 
 ## What is implemented
 
