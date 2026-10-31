@@ -13,8 +13,11 @@ It has two assignments, each split into two incremental parts:
 > **Version 2.** The first submission had logic errors that changed the meaning of several experiments: the
 > "LSTM" baseline was a vanilla RNN, NT-AvSGD triggered and averaged the wrong way, the NLU models were tested
 > on the last epoch instead of the best one, and the BERT code was missing. Everything was reviewed and
-> rewritten; [CHANGES.md](CHANGES.md) lists every problem with its fix. The two PDF reports describe the first
-> submission.
+> rewritten; [CHANGES.md](CHANGES.md) lists every problem with its fix.
+
+The two reports, written as short papers in the course template, describe methods and results:
+[language modelling](language_modeling/LM_Report.pdf) and
+[intent classification and slot filling](intent_slot_filling/NLU_Report.pdf).
 
 ## Results
 
@@ -101,6 +104,7 @@ Google Drive, so the results survive a disconnection of the runtime.
 │   ├── part_A/           LSTM / BiLSTM joint model, ATIS data, CoNLL evaluation script
 │   ├── part_B/           JointBERT
 │   └── NLU_Report.pdf
+├── reports/              LaTeX sources of the two reports (course template)
 ├── run_on_colab.ipynb
 └── CHANGES.md
 ```
@@ -108,6 +112,9 @@ Google Drive, so the results survive a disconnection of the runtime.
 Each part follows the layout required by the course: `main.py` (entry point), `model.py` (architectures),
 `functions.py` (training and evaluation), `utils.py` (data loading and preprocessing). The last cell of the
 Colab notebook packs the two folders as `LM/` and `NLU/`, the structure expected for the course submission.
+
+To rebuild a report: `cd reports && pdflatex lm_report && bibtex lm_report && pdflatex lm_report && pdflatex lm_report`
+(the same for `nlu_report`).
 
 ## References
 

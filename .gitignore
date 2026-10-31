@@ -18,3 +18,10 @@ venv/
 # Course material that is not part of this project
 /labs
 /solutions
+
+# LaTeX build files of the reports (the PDFs are copied into language_modeling/ and intent_slot_filling/)
+reports/*.aux
+reports/*.bbl
+reports/*.blg
+reports/*.log
+reports/*.pdf
