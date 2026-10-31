@@ -21,8 +21,8 @@ The two reports, written as short papers in the course template, describe method
 
 ## Results
 
-All the models were trained on a Colab T4 GPU with [`run_on_colab.ipynb`](run_on_colab.ipynb); every number
-below is reproduced by `python main.py`, which evaluates the checkpoints stored in `bin/`.
+All the models were trained on a Colab T4 GPU with [`run_on_colab.ipynb`](run_on_colab.ipynb). The raw training
+logs are in [`results/logs`](results/logs) and the loss curves of every experiment in the `plots/` folder of each part.
 
 ### Language modelling (Penn Treebank, perplexity, lower is better)
 
@@ -35,22 +35,26 @@ below is reproduced by `python main.py`, which evaluates the checkpoints stored 
 | B | + variational dropout | 99.4 | 97.4 |
 | B | + NT-AvSGD | 94.9 | **92.3** |
 
-Every technique lowers the perplexity. Part B trains with plain SGD, as NT-AvSGD requires, and still ends well
-below the AdamW model of part A; the weight averaging of NT-AvSGD alone takes 5 points off the variational
-dropout model.
+![Dev perplexity per epoch](reports/figures/lm_dev_ppl.png)
 
-### Intent classification and slot filling (ATIS test set)
+Every technique lowers the perplexity, and part B, trained with plain SGD as NT-AvSGD requires, ends well below
+the AdamW model of part A. The curves show where the NT-AvSGD gain comes from: without early stopping before the
+trigger, SGD keeps improving after epoch 58, where the run without NT-AvSGD stopped, and reaches 97.6 dev PPL;
+averaging, triggered at epoch 74, brings it to 94.9 and is still improving at the 100-epoch limit. Of the 4.5 dev
+points gained over variational dropout, 1.8 come from the longer training and 2.7 from the averaging.
+
+### Intent classification and slot filling (ATIS test set, 5 runs, mean ± std)
 
 | Model | Slot F1 | Intent accuracy |
 | - | - | - |
-| LSTM | 0.929 | 0.940 |
-| BiLSTM | 0.946 | 0.944 |
-| BiLSTM + dropout | 0.949 | 0.950 |
-| BERT (`bert-base-uncased`) | **0.953** | **0.973** |
+| LSTM | 0.922 ± 0.005 | 0.934 ± 0.004 |
+| BiLSTM | 0.941 ± 0.004 | 0.945 ± 0.001 |
+| BiLSTM + dropout | 0.946 ± 0.003 | 0.949 ± 0.003 |
+| BERT (`bert-base-uncased`) | **0.955 ± 0.001** | **0.975 ± 0.002** |
 
-Each model is trained 5 times with different seeds and the table reports the run with the best dev slot F1
-(the checkpoint in `bin/`); in every run the test set is evaluated with the weights of the best dev epoch.
-Every step of part A improves both metrics, and the fine-tuned BERT is the best model on both tasks.
+In every run the test set is evaluated with the weights of the best dev epoch. Every step of part A improves both
+metrics, and the fine-tuned BERT is the best model on both tasks, with the smallest spread on slot filling.
+`python main.py` evaluates the checkpoint kept in `bin/`, the run with the best dev slot F1.
 
 ## What is implemented
 
@@ -104,7 +108,8 @@ Google Drive, so the results survive a disconnection of the runtime.
 │   ├── part_A/           LSTM / BiLSTM joint model, ATIS data, CoNLL evaluation script
 │   ├── part_B/           JointBERT
 │   └── NLU_Report.pdf
-├── reports/              LaTeX sources of the two reports (course template)
+├── reports/              LaTeX sources of the two reports (course template) and the figure script
+├── results/logs/         training logs of the Colab run
 ├── run_on_colab.ipynb
 └── CHANGES.md
 ```
@@ -114,7 +119,7 @@ Each part follows the layout required by the course: `main.py` (entry point), `m
 Colab notebook packs the two folders as `LM/` and `NLU/`, the structure expected for the course submission.
 
 To rebuild a report: `cd reports && pdflatex lm_report && bibtex lm_report && pdflatex lm_report && pdflatex lm_report`
-(the same for `nlu_report`).
+(the same for `nlu_report`). `python reports/make_figures.py` redraws the perplexity curves from the logs.
 
 ## References
 

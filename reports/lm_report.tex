@@ -67,46 +67,60 @@ itself a plateau detector, and applied to $\bar w$ afterwards with a patience of
 \section{Results}
 
 Tables~\ref{tab:partA} and~\ref{tab:partB} report the dev and test PPL of one run per configuration (seed 42,
-trained on a T4 GPU). In part~A, dropout lowers the test PPL of the LSTM by 15.2 points and AdamW, on the same
-model, by a further 17.0, reaching 109.0. In part~B the tied LSTM reaches 116.9 with 45\% fewer parameters (the
-untied LSTM of part~A, trained with a larger batch and learning rate, reaches 141.3); variational dropout gives the
-largest gain of the study ($-19.5$), and NT-AvSGD a further $-5.1$: the average of the iterates generalises better
-than the single SGD solutions, as reported in \cite{merity2018awdlstm}. The final model, trained with plain SGD, is
-16.7 points better than the AdamW model of part~A. As usually observed on PTB, the test PPL is lower than the dev
-PPL for every model.
+trained on a T4 GPU), and Figure~\ref{fig:curves} the dev PPL after every epoch. In part~A, dropout lowers the test
+PPL of the LSTM by 15.2 points and AdamW, on the same model, by a further 17.0, reaching 109.0. In part~B the tied
+LSTM reaches 116.9 with 45\% fewer parameters (the untied LSTM of part~A, trained with a larger batch and learning
+rate, reaches 141.3), and variational dropout gives the largest gain of the study ($-19.5$). NT-AvSGD lowers the
+test PPL by a further 5.1 points, and the curves show where the gain comes from. Without early stopping before the
+trigger, SGD keeps improving after epoch 58, where the run without NT-AvSGD stopped, and its best iterate reaches
+97.6 dev PPL at epoch 72; averaging, triggered at epoch 74, brings the dev PPL to 94.9 and is still improving at
+the 100-epoch limit. Of the 4.5 dev points gained over variational dropout, 1.8 come from the longer training and
+2.7 from the averaging itself, in line with \cite{merity2018awdlstm}. The final model, trained with plain SGD, is
+16.7 test points better than the AdamW model of part~A. As usually observed on PTB, the test PPL is lower than the
+dev PPL for every model.
 
 \begin{table}[t]
   \caption{Part A: perplexity on the dev and test sets. All models have 5.66M parameters and are trained with
-  batch size 64.}
+  batch size 64; Ep.\ is the epoch of the selected checkpoint.}
   \label{tab:partA}
   \centering
   \setlength{\tabcolsep}{4.5pt}
   \begin{tabular}{l l c c c}
     \toprule
-    Model & Optimiser & Dropout & Dev & Test \\
+    Model & Optimiser & Ep. & Dev & Test \\
     \midrule
-    LSTM      & SGD, lr 2                & --  & 146.4 & 141.3 \\
-    + dropout & SGD, lr 2                & 0.4 & 131.1 & 126.0 \\
-    + AdamW   & AdamW, lr $10^{-3}$      & 0.4 & 121.2 & \textbf{109.0} \\
+    LSTM            & SGD, lr 2           & 14 & 146.4 & 141.3 \\
+    + dropout (0.4) & SGD, lr 2           & 67 & 131.1 & 126.0 \\
+    + AdamW         & AdamW, lr $10^{-3}$ & 42 & 121.2 & \textbf{109.0} \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 \begin{table}[t]
   \caption{Part B: perplexity on the dev and test sets. All models are trained with SGD (lr 1.5, batch size 32)
-  and have 3.10M parameters.}
+  and have 3.10M parameters; Ep.\ is the epoch of the selected checkpoint.}
   \label{tab:partB}
   \centering
   \begin{tabular}{l c c c}
     \toprule
-    Model & Dropout & Dev & Test \\
+    Model & Ep. & Dev & Test \\
     \midrule
-    LSTM + weight tying     & --  & 120.7 & 116.9 \\
-    + variational dropout   & 0.4 & 99.4  & 97.4 \\
-    + NT-AvSGD ($n=5$)      & 0.4 & 94.9  & \textbf{92.3} \\
+    LSTM + weight tying         & 20  & 120.7 & 116.9 \\
+    + variational dropout (0.4) & 55  & 99.4  & 97.4 \\
+    + NT-AvSGD ($n=5$)          & 100 & 94.9  & \textbf{92.3} \\
     \bottomrule
   \end{tabular}
 \end{table}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/lm_dev_ppl.pdf}
+  \caption{Dev perplexity after every epoch (the first epochs, above 190, are cut). Dots mark the selected
+  checkpoint of each run, i.e.\ its best dev epoch. The two runs with variational dropout coincide up to epoch 58,
+  where early stopping ends the one without NT-AvSGD; with NT-AvSGD the averaged weights are evaluated from
+  epoch 74 on.}
+  \label{fig:curves}
+\end{figure*}
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}

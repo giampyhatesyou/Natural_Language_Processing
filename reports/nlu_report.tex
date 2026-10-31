@@ -16,9 +16,9 @@
 
 \begin{abstract}
 We train a single model to recognise the intent of a flight-domain request and to label its words with semantic
-slots. On ATIS, a bidirectional LSTM with dropout raises the slot F1 of an LSTM baseline from 92.86 to 94.90 and
-its intent accuracy from 93.95\% to 94.96\%. Fine-tuning BERT, with the slot labels aligned to the first WordPiece
-of every word, reaches 95.33 slot F1 and 97.31\% intent accuracy.
+slots. On ATIS, a bidirectional LSTM with dropout raises the slot F1 of an LSTM baseline from 92.24 to 94.59 and
+its intent accuracy from 93.44\% to 94.94\%. Fine-tuning BERT, with the slot labels aligned to the first WordPiece
+of every word, reaches 95.49 slot F1 and 97.54\% intent accuracy (means over 5 runs).
 \end{abstract}
 
 \section{Introduction}
@@ -64,26 +64,28 @@ best weights are restored before testing.
 
 \section{Results}
 
-Table~\ref{tab:results} reports, for each model, the test scores of the run with the best dev slot F1 among the
-five. The bidirectional encoder gives the largest gain on slot filling (+1.77 F1), since the backward direction lets
-the label of a word depend on the words that follow it. Dropout improves both tasks (+0.27 F1, +0.56 points of
-accuracy). BERT is the best model on both tasks: the margin is large on intents (+2.35 points), where a pre-trained
-representation of the whole sentence helps most, and smaller on slots (+0.43 F1), which in ATIS largely depend on
-local lexical cues already captured by the BiLSTM. Thanks to the first-sub-token alignment, the WordPiece
+Table~\ref{tab:results} reports mean and standard deviation of the test scores over the five runs. The
+bidirectional encoder gives the largest gain on slot filling (+1.89 F1), since the backward direction lets the label
+of a word depend on the words that follow it. Dropout improves both tasks (+0.46 F1, +0.40 points of accuracy) and
+reduces the spread of the slot F1 across runs. BERT is the best model on both tasks: the margin is large on intents
+(+2.60 points), where a pre-trained representation of the whole sentence helps most, and smaller on slots
+(+0.90 F1), which in ATIS largely depend on local lexical cues already captured by the BiLSTM; it is also the most
+stable model ($\pm$0.10 F1). Averaging over runs matters: the BERT run with the best dev F1, the one kept as
+checkpoint, has the lowest test F1 of the five (95.33). Thanks to the first-sub-token alignment, the WordPiece
 segmentation does not penalise BERT: all the models are scored on exactly the same words.
 
 \begin{table}[t]
-  \caption{Test results on ATIS: run with the best dev slot F1 out of 5.}
+  \caption{Test results on ATIS: mean and standard deviation over 5 runs, each evaluated at its best dev epoch.}
   \label{tab:results}
   \centering
   \begin{tabular}{l c c}
     \toprule
     Model & Slot F1 & Intent acc. (\%) \\
     \midrule
-    LSTM             & 92.86 & 93.95 \\
-    BiLSTM           & 94.63 & 94.40 \\
-    BiLSTM + dropout & 94.90 & 94.96 \\
-    BERT             & \textbf{95.33} & \textbf{97.31} \\
+    LSTM             & 92.24 $\pm$ 0.48 & 93.44 $\pm$ 0.42 \\
+    BiLSTM           & 94.13 $\pm$ 0.41 & 94.54 $\pm$ 0.13 \\
+    BiLSTM + dropout & 94.59 $\pm$ 0.27 & 94.94 $\pm$ 0.31 \\
+    BERT             & \textbf{95.49} $\pm$ 0.10 & \textbf{97.54} $\pm$ 0.21 \\
     \bottomrule
   \end{tabular}
 \end{table}
