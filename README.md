@@ -69,6 +69,14 @@ python main.py                                # evaluate the checkpoints in bin/
 Every part works the same way (`LM/part_A`, `LM/part_B`, `NLU/part_A`, `NLU/part_B`) and can be launched from
 any directory. Hyperparameters are at the top of each `main.py`. Model weights are not stored in git.
 
+### On a GPU with Google Colab
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/giampyhatesyou/Natural_Language_Processing/blob/main/run_on_colab.ipynb)
+
+[`run_on_colab.ipynb`](run_on_colab.ipynb) clones the repository, trains the four parts (one cell each) and
+evaluates the checkpoints. After every part, the checkpoints, the loss curves and the logs are copied to
+Google Drive, so the results survive a disconnection of the runtime.
+
 ## Repository structure
 
 ```
