@@ -28,7 +28,7 @@ class Lang():
 def align_slot_labels(word_ids, word_labels):
     """Move the word-level slot labels to the sub-token level.
 
-    WordPiece can split a word into several sub-tokens (e.g. "philadelphia" -> "phil", "##ade", "##lphia").
+    WordPiece can split a word into several sub-tokens (e.g. "burbank" -> "bu", "##rba", "##nk").
     The label of the word goes to its FIRST sub-token only; the other sub-tokens and the special tokens
     get IGNORE_INDEX, so the loss and the evaluation see exactly one prediction per original word.
     word_ids comes from the tokenizer: the index of the word of every sub-token (None for special tokens).
