@@ -1,6 +1,0 @@
-torch>=2.0
-numpy
-scikit-learn>=1.2
-tqdm
-matplotlib
-transformers>=4.30  # NLU part B (BERT)

@@ -1,10 +1,11 @@
-# Natural Language Understanding: language modelling and joint intent/slot filling
+# nlu-ablations
 
-[![CI](https://github.com/giampyhatesyou/Natural_Language_Processing/actions/workflows/ci.yml/badge.svg)](https://github.com/giampyhatesyou/Natural_Language_Processing/actions/workflows/ci.yml)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/giampyhatesyou/Natural_Language_Processing/blob/main/run_on_colab.ipynb)
+[![CI](https://github.com/giampyhatesyou/nlu-ablations/actions/workflows/ci.yml/badge.svg)](https://github.com/giampyhatesyou/nlu-ablations/actions/workflows/ci.yml)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/giampyhatesyou/nlu-ablations/blob/main/run_on_colab.ipynb)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Two classic NLU problems studied with an incremental protocol: every technique is added on top of the best model of
-the previous step and evaluated on held-out data.
+Two classic natural language understanding problems studied with an incremental protocol: every technique is added
+on top of the best model of the previous step and evaluated on held-out data.
 
 - **Language modelling on the Penn Treebank.** LSTM → dropout → AdamW, then the AWD-LSTM recipe: weight tying →
   variational dropout → NT-AvSGD. Test perplexity goes from 141.3 to 92.3.
@@ -12,10 +13,10 @@ the previous step and evaluated on held-out data.
   92.2 to 95.5 and intent accuracy from 93.4% to 97.5% (means over 5 runs).
 
 The project started as the final assignment of the NLU course at the University of Trento. A later review of that
-first version found errors that changed the meaning of several experiments; the code was rewritten and verified,
-and the review is documented in the [post-mortem](POST_MORTEM.md). Methods and results are described in two short
-papers: [language modelling](language_modeling/LM_Report.pdf) and
-[intent classification and slot filling](intent_slot_filling/NLU_Report.pdf).
+first version found errors that changed the meaning of several experiments; the code was rewritten as a tested
+Python package, and the review is documented in the [post-mortem](POST_MORTEM.md). Methods and results are
+described in two short papers: [language modelling](reports/lm_report.pdf) and
+[intent classification and slot filling](reports/slu_report.pdf).
 
 ## Results
 
@@ -24,11 +25,11 @@ papers: [language modelling](language_modeling/LM_Report.pdf) and
 | Part | Model | Dev PPL | Test PPL |
 | - | - | - | - |
 | A | LSTM | 146.4 | 141.3 |
-| A | + dropout | 131.1 | 126.0 |
+| A | + dropout (0.4) | 131.1 | 126.0 |
 | A | + AdamW | 121.2 | **109.0** |
 | B | LSTM + weight tying | 120.7 | 116.9 |
-| B | + variational dropout | 99.4 | 97.4 |
-| B | + NT-AvSGD | 94.9 | **92.3** |
+| B | + variational dropout (0.4) | 99.4 | 97.4 |
+| B | + NT-AvSGD (n = 5) | 94.9 | **92.3** |
 
 ![Dev perplexity per epoch](reports/figures/lm_dev_ppl.png)
 
@@ -50,8 +51,10 @@ configuration was trained once, so these numbers carry no estimate of the varian
 
 Mean ± sample standard deviation over 5 seeds; p is Welch's t-test against the previous row. The bidirectional
 encoder and BERT bring significant gains on both tasks; the gain of dropout is within the variation between seeds.
-BERT is the best model on both tasks, by a wide margin on intents. `python main.py` evaluates the checkpoint kept
-in `bin/`, the run with the best dev slot F1.
+BERT is the best model on both tasks, by a wide margin on intents.
+
+Both tables, the figure and the tables of the papers are generated from the JSON records in [`results/`](results)
+by `python reports/analysis.py`.
 
 ## Methodology
 
@@ -61,43 +64,64 @@ in `bin/`, the run with the best dev slot F1.
   vocabulary). ATIS with 4,978 training and 893 test utterances, 26 intents and 129 slot labels; 10% of the
   training set, stratified by intent, is held out as dev set.
 - **Model selection.** Early stopping looks only at the dev set (perplexity for the language models, slot F1 for
-  the NLU models). The weights of the best dev epoch are restored, and the test set is evaluated once per run.
+  the intent/slot models). The weights of the best dev epoch are restored, and the test set is evaluated once per
+  run. When a model is trained more than once, the checkpoint kept is the run with the best dev score.
 - **Metrics.** Perplexity is the exponential of the mean cross-entropy over all the predicted tokens, `<eos>`
   included and padding excluded. Slot F1 is the chunk-level F1 of conlleval on the original words: for BERT, the
   prediction of a word is the one of its first WordPiece sub-token, so all the models are scored on the same units.
-- **Variance and significance.** Every NLU model is trained 5 times with different seeds; tables report mean and
-  sample standard deviation, and consecutive models are compared with Welch's t-test (α = 0.05).
+- **Variance and significance.** Every intent/slot model is trained 5 times with different seeds; tables report mean
+  and sample standard deviation, and consecutive models are compared with Welch's t-test (α = 0.05).
 - **Verification.** The algorithms and the evaluation code have their own tests (see below), including an oracle
   check: a model that returns the gold labels must score exactly 1.0.
 
 ## Reproducibility
 
 ```bash
-pip install -r requirements.txt
-cd intent_slot_filling/part_A
-python main.py --train                        # train every experiment of this part (checkpoints in bin/)
-python main.py --train --exp bilstm_dropout   # or a single one
-python main.py                                # evaluate the checkpoints in bin/ on the test set
+git clone https://github.com/giampyhatesyou/nlu-ablations.git
+cd nlu-ablations
+pip install -e ".[dev]"    # Python 3.10 or later
 ```
-
-The four parts work the same way, can be launched from any directory and keep their hyperparameters at the top of
-`main.py`. Seeds are fixed (42 plus the run index), so a re-run gives the same results up to the nondeterminism of
-GPU kernels.
-
-On a GPU, [`run_on_colab.ipynb`](run_on_colab.ipynb) clones the repository, trains every part, copies checkpoints,
-plots and logs to Google Drive after each part, and evaluates the checkpoints. On a free Colab T4 the whole run
-takes about 2 hours and 20 minutes: 48 minutes for language modelling part A, 63 for part B, 8 for the LSTM
-intent/slot models and 20 for BERT.
-
-The logs of that run are in [`results/logs`](results/logs) and the loss curves of every experiment in the `plots/`
-folder of each part. `python reports/analysis.py` rebuilds the perplexity figure and the significance table from
-the logs. Model weights are not stored in git because of their size.
 
 ```bash
-pip install pytest ruff
-ruff check .    # lint
-pytest          # unit and regression tests, about a minute on CPU
+python -m nlu_ablations.lm --train                  # train the six language models
+python -m nlu_ablations.lm --train --exp wt wt_vd   # or some of them
+python -m nlu_ablations.lm                          # evaluate the checkpoints on the test set
+python -m nlu_ablations.slu --train --exp bert      # the same for intent classification and slot filling
+python reports/analysis.py                          # tables and figure, from the JSON records
 ```
+
+The two command lines are also installed as `nlu-lm` and `nlu-slu`, and `--help` lists their options: number of
+runs and epochs, seed, data and output folders. The hyperparameters of every experiment are in a registry at the
+top of [`lm/cli.py`](nlu_ablations/lm/cli.py) and [`slu/cli.py`](nlu_ablations/slu/cli.py), and a test checks that
+within each part every experiment differs from the previous one only in the technique it adds. Seeds are fixed (42
+plus the run index), so a re-run gives the same results up to the nondeterminism of GPU kernels.
+
+Every training writes:
+
+- `results/<task>/<experiment>.json`: configuration, software and hardware, and for every run the seed, the selected
+  epoch, the dev and test scores and the per-epoch history;
+- `results/plots/<task>/<experiment>.png`: the loss curves of the selected run;
+- `checkpoints/<task>/<experiment>.pt`: the weights of the run with the best dev score, which are not stored in git
+  because of their size.
+
+The records in `results/` come from a run on a free Colab T4 GPU in October 2026, which took about 2 hours and
+20 minutes: 48 minutes for language modelling part A, 63 for part B, 8 for the LSTM intent/slot models and 20 for
+BERT. That run predates the JSON records: [`scripts/logs_to_results.py`](scripts/logs_to_results.py) converted its
+logs, kept in [`results/logs`](results/logs), and checked that the hyperparameters they print are the ones of the
+current registries. The run was made with the code before its refactoring into a package, and the package was
+checked against that code: checkpoints saved by the old code give the same test scores when evaluated with the
+package, and on CPU the two versions produce identical training runs from the same seed.
+
+On a GPU, [`run_on_colab.ipynb`](run_on_colab.ipynb) clones the repository, trains every experiment, copies
+checkpoints and results to Google Drive after each group of experiments and evaluates the checkpoints.
+
+```bash
+ruff check .    # lint
+pytest          # unit, regression and end-to-end tests, under a minute on CPU
+```
+
+The tests download nothing: the BERT pipeline is tested with a tiny WordPiece vocabulary and a randomly initialised
+two-layer BERT built on the fly.
 
 ## Limitations
 
@@ -108,8 +132,6 @@ pytest          # unit and regression tests, about a minute on CPU
   tied LSTM of part B is not a controlled one.
 - NT-AvSGD hit the 100-epoch limit while still improving, and part of its gain comes from the longer training that
   its stopping rule allows.
-- Penn Treebank and ATIS derive from corpora of the Linguistic Data Consortium; the preprocessed copies in this
-  repository are the ones distributed with the course material.
 
 ## What I learned
 
@@ -124,30 +146,42 @@ pytest          # unit and regression tests, about a minute on CPU
 - **Report variance and test significance.** Of the three steps of the intent/slot experiments, one (dropout) is
   within the noise between seeds.
 - **Select on dev, report the mean.** The BERT run with the best dev F1 is the worst of the five on the test set.
+- **One implementation per idea.** The first version had four copies of the seeding, initialisation, early-stopping
+  and checkpoint code, one per part; in a single package there is one place to fix and one place to test.
+- **Results are data.** Every training writes a JSON record, and every table and figure is generated from those
+  records instead of being copied from a log.
 
 ## Repository structure
 
 ```
-├── language_modeling/
-│   ├── dataset/          Penn Treebank (train / valid / test)
-│   ├── part_A/           LSTM, dropout, AdamW
-│   ├── part_B/           weight tying, variational dropout, NT-AvSGD
-│   └── LM_Report.pdf
-├── intent_slot_filling/
-│   ├── part_A/           LSTM / BiLSTM joint model, ATIS data, CoNLL evaluation script
-│   ├── part_B/           JointBERT
-│   └── NLU_Report.pdf
-├── reports/              LaTeX sources of the papers, analysis script, generated figure and table
-├── results/logs/         training logs of the Colab run
-├── tests/                unit and regression tests
-├── run_on_colab.ipynb
-└── POST_MORTEM.md        review of the first version
+├── nlu_ablations/           the Python package
+│   ├── common.py            seeding, initialisation, early stopping, checkpoints, statistics, plots
+│   ├── results.py           JSON record of an experiment
+│   ├── lm/                  language modelling: data, model, NT-AvSGD, training loop, command line
+│   └── slu/                 intent classification and slot filling: data for the LSTMs and for BERT, models,
+│                            conlleval, training loop, command line
+├── data/                    Penn Treebank and ATIS
+├── results/
+│   ├── lm/, slu/            JSON record of every experiment
+│   ├── plots/               loss curves of the selected runs
+│   └── logs/                training logs of the Colab run
+├── reports/                 the two papers (PDF and LaTeX sources), analysis.py, generated tables and figure
+├── scripts/                 conversion of the logs of the Colab run into JSON records
+├── tests/                   unit, regression and end-to-end tests
+├── run_on_colab.ipynb       training and evaluation on a Colab GPU
+├── POST_MORTEM.md           review of the first version
+└── pyproject.toml           package metadata, dependencies, ruff and pytest configuration
 ```
 
-Each part is self-contained: `main.py` (entry point), `model.py` (architectures), `functions.py` (training and
-evaluation) and `utils.py` (data loading and preprocessing). To rebuild a paper:
-`cd reports && pdflatex lm_report && bibtex lm_report && pdflatex lm_report && pdflatex lm_report` (the same for
-`nlu_report`).
+To rebuild a paper: `cd reports && pdflatex lm_report && bibtex lm_report && pdflatex lm_report && pdflatex
+lm_report` (the same for `slu_report`).
+
+## License
+
+The code is released under the [MIT license](LICENSE), with one exception: `nlu_ablations/slu/conll.py`, a Python
+port of the conlleval script distributed with the course material. The Penn Treebank and ATIS data in `data/` are
+not covered by the license either: they derive from corpora of the Linguistic Data Consortium, and the preprocessed
+copies are the ones distributed with the course material.
 
 ## References
 

@@ -13,10 +13,11 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - name: Install dependencies
+          cache-dependency-path: pyproject.toml
+      - name: Install the package
         run: |
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install -r requirements.txt pytest ruff==0.17.3
+          pip install -e ".[dev]"
       - name: Lint
         run: ruff check .
       - name: Test

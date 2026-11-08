@@ -1,0 +1,74 @@
+{
+ "task": "slu",
+ "experiment": "bert",
+ "date": "2026-10-31",
+ "environment": null,
+ "source": "converted from results/logs/slu_part_b.log by scripts/logs_to_results.py",
+ "config": {
+  "model": "bert",
+  "bert_model": "bert-base-uncased",
+  "dropout": 0.1,
+  "lr": 5e-05,
+  "weight_decay": 0.01,
+  "warmup": 0.1,
+  "batch_size_train": 32,
+  "batch_size_eval": 64,
+  "clip": 1.0,
+  "n_epochs": 10,
+  "patience": 3,
+  "runs": 5,
+  "seed": 42
+ },
+ "runs": [
+  {
+   "seed": 42,
+   "epochs": 10,
+   "best_epoch": null,
+   "dev_slot_f1": 0.9849,
+   "test_slot_f1": 0.9533,
+   "test_intent_acc": 0.973124300111982,
+   "seconds": 241,
+   "history": null
+  },
+  {
+   "seed": 43,
+   "epochs": 10,
+   "best_epoch": null,
+   "dev_slot_f1": 0.9832,
+   "test_slot_f1": 0.9546,
+   "test_intent_acc": 0.973124300111982,
+   "seconds": 239,
+   "history": null
+  },
+  {
+   "seed": 44,
+   "epochs": 10,
+   "best_epoch": null,
+   "dev_slot_f1": 0.9829,
+   "test_slot_f1": 0.9562,
+   "test_intent_acc": 0.9764837625979843,
+   "seconds": 266,
+   "history": null
+  },
+  {
+   "seed": 45,
+   "epochs": 10,
+   "best_epoch": null,
+   "dev_slot_f1": 0.9835,
+   "test_slot_f1": 0.9555,
+   "test_intent_acc": 0.9787234042553191,
+   "seconds": 266,
+   "history": null
+  },
+  {
+   "seed": 46,
+   "epochs": 9,
+   "best_epoch": null,
+   "dev_slot_f1": 0.9829,
+   "test_slot_f1": 0.9549,
+   "test_intent_acc": 0.975363941769317,
+   "seconds": 212,
+   "history": null
+  }
+ ]
+}

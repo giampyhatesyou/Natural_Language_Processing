@@ -1,0 +1,75 @@
+{
+ "task": "slu",
+ "experiment": "bilstm_dropout",
+ "date": "2026-10-31",
+ "environment": null,
+ "source": "converted from results/logs/slu_part_a.log by scripts/logs_to_results.py",
+ "config": {
+  "model": "lstm",
+  "emb_size": 300,
+  "hid_size": 200,
+  "n_layer": 1,
+  "bidirectional": true,
+  "dropout": 0.3,
+  "lr": 0.001,
+  "batch_size_train": 128,
+  "batch_size_eval": 64,
+  "clip": 5,
+  "n_epochs": 100,
+  "patience": 10,
+  "runs": 5,
+  "seed": 42
+ },
+ "runs": [
+  {
+   "seed": 42,
+   "epochs": 51,
+   "best_epoch": null,
+   "dev_slot_f1": 0.9802,
+   "test_slot_f1": 0.9448,
+   "test_intent_acc": 0.9440089585666294,
+   "seconds": 34,
+   "history": null
+  },
+  {
+   "seed": 43,
+   "epochs": 39,
+   "best_epoch": null,
+   "dev_slot_f1": 0.9799,
+   "test_slot_f1": 0.9471,
+   "test_intent_acc": 0.9529675251959686,
+   "seconds": 25,
+   "history": null
+  },
+  {
+   "seed": 44,
+   "epochs": 37,
+   "best_epoch": null,
+   "dev_slot_f1": 0.9749,
+   "test_slot_f1": 0.9413,
+   "test_intent_acc": 0.948488241881299,
+   "seconds": 24,
+   "history": null
+  },
+  {
+   "seed": 45,
+   "epochs": 58,
+   "best_epoch": null,
+   "dev_slot_f1": 0.9802,
+   "test_slot_f1": 0.949,
+   "test_intent_acc": 0.9496080627099664,
+   "seconds": 38,
+   "history": null
+  },
+  {
+   "seed": 46,
+   "epochs": 43,
+   "best_epoch": null,
+   "dev_slot_f1": 0.9796,
+   "test_slot_f1": 0.9475,
+   "test_intent_acc": 0.9518477043673013,
+   "seconds": 28,
+   "history": null
+  }
+ ]
+}

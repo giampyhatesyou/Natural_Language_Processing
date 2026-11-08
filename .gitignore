@@ -7,17 +7,19 @@
 # Python
 __pycache__/
 *.py[cod]
+*.egg-info/
+build/
+dist/
 .venv/
 venv/
 .conda/
 
-# Model weights: too large for git, they are produced in each part's bin/ by `python main.py --train`
+# Model weights: too large for git. Training writes them to checkpoints/<task>/<experiment>.pt
 # (publish them as a GitHub Release asset instead)
-**/bin/*.pt
+/checkpoints/
 
-# LaTeX build files of the reports (the PDFs are copied into language_modeling/ and intent_slot_filling/)
+# LaTeX build files of the papers
 reports/*.aux
 reports/*.bbl
 reports/*.blg
 reports/*.log
-reports/*.pdf
