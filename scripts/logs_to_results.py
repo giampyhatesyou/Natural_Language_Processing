@@ -9,10 +9,10 @@ import ast
 import json
 import re
 
-from nlu_ablations import DATA_DIR, RESULTS_DIR
-from nlu_ablations.lm.cli import experiment_config as lm_config
-from nlu_ablations.slu.cli import experiment_config as slu_config
-from nlu_ablations.slu.data import load_data
+from nlp import DATA_DIR, RESULTS_DIR
+from nlp.lm.cli import experiment_config as lm_config
+from nlp.slu.cli import experiment_config as slu_config
+from nlp.slu.data import load_data
 
 LOGS = RESULTS_DIR / "logs"
 # keys that the first layout of the project named differently

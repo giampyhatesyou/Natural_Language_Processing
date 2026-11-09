@@ -18,8 +18,9 @@ venv/
 # (publish them as a GitHub Release asset instead)
 /checkpoints/
 
-# LaTeX build files of the papers
-reports/*.aux
-reports/*.bbl
-reports/*.blg
-reports/*.log
+# LaTeX build files of the paper
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out

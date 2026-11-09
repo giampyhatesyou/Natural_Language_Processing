@@ -1,7 +1,7 @@
 """Results of every experiment as a JSON file: results/<task>/<experiment>.json.
 
 A record holds the configuration and one entry per run (seed, selected epoch, dev and test scores, per-epoch
-history); tables and figures of the reports are computed from these files only.
+history); the tables and figures of the paper and of the README are computed from these files only.
 """
 import json
 import platform

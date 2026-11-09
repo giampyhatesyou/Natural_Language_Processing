@@ -1,8 +1,8 @@
 """Joint intent classification and slot filling on ATIS: the four models of the incremental study.
 
-    python -m nlu_ablations.slu                      # evaluate the checkpoints in checkpoints/slu/
-    python -m nlu_ablations.slu --train              # train every model (5 runs each)
-    python -m nlu_ablations.slu --train --exp bert   # fine-tune BERT only
+    python -m nlp.slu                      # evaluate the checkpoints in checkpoints/slu/
+    python -m nlp.slu --train              # train every model (5 runs each)
+    python -m nlp.slu --train --exp bert   # fine-tune BERT only
 """
 import argparse
 import time
@@ -135,7 +135,7 @@ def train_experiment(name, config, vocab, datasets, collate, checkpoints_dir, re
 def evaluate_checkpoint(name, test_raw, checkpoints_dir):
     path = checkpoints_dir / "slu" / f"{name}.pt"
     if not path.exists():
-        print(f"'{name}': no checkpoint in {path}, train it with: python -m nlu_ablations.slu --train --exp {name}")
+        print(f"'{name}': no checkpoint in {path}, train it with: python -m nlp.slu --train --exp {name}")
         return None
     checkpoint = load_checkpoint(path)
     config = checkpoint["config"]
@@ -159,7 +159,7 @@ def evaluate_checkpoint(name, test_raw, checkpoints_dir):
 
 def run(argv=None):
     """Run the command line and return the test scores of every experiment."""
-    parser = argparse.ArgumentParser(prog="python -m nlu_ablations.slu", description=__doc__,
+    parser = argparse.ArgumentParser(prog="python -m nlp.slu", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--train", action="store_true", help="train the models (default: evaluate the checkpoints)")
     parser.add_argument("--exp", nargs="+", default=["all"], choices=["all", *EXPERIMENTS])

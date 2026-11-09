@@ -7,13 +7,13 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader, Subset
 
-from nlu_ablations import DATA_DIR
-from nlu_ablations.common import load_checkpoint
-from nlu_ablations.slu import bert_data, cli
-from nlu_ablations.slu.bert_data import BertIntentsAndSlots, LabelVocabulary, align_slot_labels
-from nlu_ablations.slu.data import IGNORE_INDEX, load_data
-from nlu_ablations.slu.models import JointBERT
-from nlu_ablations.slu.training import bert_optimizer, evaluate, fit, linear_warmup
+from nlp import DATA_DIR
+from nlp.common import load_checkpoint
+from nlp.slu import bert_data, cli
+from nlp.slu.bert_data import BertIntentsAndSlots, LabelVocabulary, align_slot_labels
+from nlp.slu.data import IGNORE_INDEX, load_data
+from nlp.slu.models import JointBERT
+from nlp.slu.training import bert_optimizer, evaluate, fit, linear_warmup
 
 ATIS = DATA_DIR / "atis"
 

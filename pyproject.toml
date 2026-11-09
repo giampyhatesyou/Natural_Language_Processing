@@ -3,9 +3,9 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nlu-ablations"
+name = "natural-language-processing"
 version = "2.0.0"
-description = "Incremental ablation studies on language modelling (Penn Treebank) and joint intent classification and slot filling (ATIS), from LSTMs to BERT"
+description = "Can we trust an ablation study? An audit of two incremental NLP studies: LSTM language models on Penn Treebank and joint intent classification and slot filling on ATIS"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -25,11 +25,11 @@ dependencies = [
 dev = ["pytest", "ruff==0.17.3"]
 
 [project.scripts]
-nlu-lm = "nlu_ablations.lm.cli:main"
-nlu-slu = "nlu_ablations.slu.cli:main"
+nlp-lm = "nlp.lm.cli:main"
+nlp-slu = "nlp.slu.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["nlu_ablations*"]
+include = ["nlp*"]
 
 [tool.ruff]
 line-length = 120
@@ -41,7 +41,7 @@ extend-exclude = ["*.ipynb"]
 select = ["E", "F", "W", "I", "B"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["nlu_ablations"]
+known-first-party = ["nlp"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

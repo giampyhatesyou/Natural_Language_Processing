@@ -1,8 +1,8 @@
 """Language modelling on the Penn Treebank: the six experiments of the incremental study.
 
-    python -m nlu_ablations.lm                         # evaluate the checkpoints in checkpoints/lm/
-    python -m nlu_ablations.lm --train                 # train every experiment
-    python -m nlu_ablations.lm --train --exp wt wt_vd  # train some of them
+    python -m nlp.lm                         # evaluate the checkpoints in checkpoints/lm/
+    python -m nlp.lm --train                 # train every experiment
+    python -m nlp.lm --train --exp wt wt_vd  # train some of them
 """
 import argparse
 import time
@@ -124,7 +124,7 @@ def train_experiment(name, config, vocab, datasets, checkpoints_dir, results_dir
 def evaluate_checkpoint(name, vocab, datasets, checkpoints_dir):
     path = checkpoints_dir / "lm" / f"{name}.pt"
     if not path.exists():
-        print(f"'{name}': no checkpoint in {path}, train it with: python -m nlu_ablations.lm --train --exp {name}")
+        print(f"'{name}': no checkpoint in {path}, train it with: python -m nlp.lm --train --exp {name}")
         return None
     checkpoint = load_checkpoint(path)
     if checkpoint["word2id"] != vocab.word2id:
@@ -139,7 +139,7 @@ def evaluate_checkpoint(name, vocab, datasets, checkpoints_dir):
 
 def run(argv=None):
     """Run the command line and return the test scores of every experiment."""
-    parser = argparse.ArgumentParser(prog="python -m nlu_ablations.lm", description=__doc__,
+    parser = argparse.ArgumentParser(prog="python -m nlp.lm", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--train", action="store_true", help="train the models (default: evaluate the checkpoints)")
     parser.add_argument("--exp", nargs="+", default=["all"], choices=["all", *EXPERIMENTS])

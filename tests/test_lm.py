@@ -4,13 +4,13 @@ import pytest
 import torch
 from torch import nn
 
-from nlu_ablations import DATA_DIR
-from nlu_ablations.common import EarlyStopping, init_weights, load_checkpoint
-from nlu_ablations.lm import cli
-from nlu_ablations.lm.data import Vocabulary, read_file
-from nlu_ablations.lm.models import LSTMLanguageModel, VariationalDropout
-from nlu_ablations.lm.ntavsgd import NTAvSGD
-from nlu_ablations.lm.training import evaluate, fit
+from nlp import DATA_DIR
+from nlp.common import EarlyStopping, init_weights, load_checkpoint
+from nlp.lm import cli
+from nlp.lm.data import Vocabulary, read_file
+from nlp.lm.models import LSTMLanguageModel, VariationalDropout
+from nlp.lm.ntavsgd import NTAvSGD
+from nlp.lm.training import evaluate, fit
 
 PTB = DATA_DIR / "ptb"
 

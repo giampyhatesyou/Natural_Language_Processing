@@ -6,12 +6,12 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
-from nlu_ablations import DATA_DIR
-from nlu_ablations.common import init_weights, sample_std, save_checkpoint
-from nlu_ablations.slu import cli
-from nlu_ablations.slu.data import PAD_TOKEN, IntentsAndSlots, collate_fn, create_dev_set, load_data
-from nlu_ablations.slu.models import JointLSTM
-from nlu_ablations.slu.training import evaluate, fit
+from nlp import DATA_DIR
+from nlp.common import init_weights, sample_std, save_checkpoint
+from nlp.slu import cli
+from nlp.slu.data import PAD_TOKEN, IntentsAndSlots, collate_fn, create_dev_set, load_data
+from nlp.slu.models import JointLSTM
+from nlp.slu.training import evaluate, fit
 
 ATIS = DATA_DIR / "atis"
 

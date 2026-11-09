@@ -22,3 +22,20 @@ jobs:
         run: ruff check .
       - name: Test
         run: pytest -q
+
+  mutation:
+    # Every error found by the audit is put back into the code, one at a time: the tests must catch all of them
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install the package
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e ".[dev]"
+      - name: Mutation analysis of the test suite
+        run: python scripts/mutation_test.py

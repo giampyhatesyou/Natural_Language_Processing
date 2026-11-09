@@ -1,0 +1,48 @@
+{
+ "description": "Test scores reported by the original implementation of the two studies (reports of 2025, preserved in the git history at commit 6dcb369). They are the numbers as reported: AUDIT.md lists the errors behind them.",
+ "lm": {
+  "lstm": {
+   "test_ppl": 160.0,
+   "note": "the 'LSTM' was built with nn.RNN"
+  },
+  "lstm_dropout": {
+   "test_ppl": 102.43,
+   "note": "the model also tied the input and output embeddings"
+  },
+  "lstm_dropout_adamw": {
+   "test_ppl": 101.37,
+   "note": "AdamW was applied to the model without dropout"
+  },
+  "wt": {
+   "test_ppl": 117.98
+  },
+  "wt_vd": {
+   "test_ppl": 95.79
+  },
+  "wt_vd_ntavsgd": {
+   "test_ppl": 96.02,
+   "note": "trigger without the non-monotone interval, average of per-epoch snapshots, selection on the SGD weights"
+  }
+ },
+ "slu": {
+  "lstm": {
+   "test_slot_f1": 0.9256,
+   "test_intent_acc": 0.9295
+  },
+  "bilstm": {
+   "test_slot_f1": 0.939,
+   "test_intent_acc": 0.953
+  },
+  "bilstm_dropout": {
+   "test_slot_f1": 0.9432,
+   "test_intent_acc": 0.9496,
+   "note": "the dropout before the intent layer was applied after the intent logits"
+  },
+  "bert": {
+   "test_slot_f1": 0.89,
+   "test_intent_acc": 0.969,
+   "note": "best configuration of a hyperparameter search; the code was never committed"
+  }
+ },
+ "notes": "LM: one run per configuration. ATIS LSTM models: mean over 5 runs, each tested with the weights of its last epoch. Hyperparameters differ in part from the audited study (see the paper, Section 3)."
+}
