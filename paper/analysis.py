@@ -333,7 +333,8 @@ def effects_table(rows):
         outcome_tex = row["outcome"].replace("x ", "$\\times$ ")
         audited = f"{row['audited']:+.2f}" if row["p"] is not None else f"{row['audited']:+.1f}"
         original = f"{row['original']:+.2f}" if row["task"] == "slu" else f"{row['original']:+.1f}"
-        latex.append(f"  {row['step']} & {row['metric']} & {original} & {audited} & {outcome_tex} \\\\")
+        signed = [value.replace("-", "$-$") for value in (original, audited)]  # a minus sign, not a hyphen
+        latex.append(f"  {row['step']} & {row['metric']} & {signed[0]} & {signed[1]} & {outcome_tex} \\\\")
         markdown.append(f"| {row['step']} | {row['metric']} | {original} | {audited} | "
                         f"{format_p(row['p'], markdown=True)} | {row['outcome'].replace('x ', '× ')} |")
     latex += ["  \\bottomrule", "\\end{tabular}", ""]
